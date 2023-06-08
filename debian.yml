@@ -5,8 +5,8 @@
     - name: "githubuser"
       prompt: "Enter your GitHub username"
       private: no
-    - name: "githubpassword"
-      prompt: "Enter your GitHub password"
+    - name: "githubtoken"
+      prompt: "Enter your GitHub personal access token"
       private: yes
   tasks:
     - name: Install required packages
@@ -16,7 +16,7 @@
 
     - name: Clone the dotfiles repository
       git:
-        repo: "https://{{ githubuser | urlencode }}:{{ githubpassword | urlencode }}@github.com/paysancorrezien/dotfiles.git"
+        repo: "https://{{ githubtoken }}@github.com/paysancorrezien/dotfiles.git"
         dest: "~/dotfiles"
         version: main
         force: yes
@@ -54,3 +54,18 @@
         nvm install node
       args:
         creates: "{{ ansible_env.HOME }}/.nvm/versions/node"
+
+    - name: Install Zap for Zsh
+      shell: |
+        bash <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/bin/install)
+
+    - name: Change shell to zsh
+      user:
+        name: "{{ ansible_env.USER }}"
+        shell: /usr/bin/zsh
+
+    - name: Allow ansible user to execute sudo without password
+      lineinfile:
+        dest: /etc/sudoers
+        line: '{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
