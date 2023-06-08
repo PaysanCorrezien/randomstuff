@@ -9,30 +9,11 @@
       private: yes
   tasks:
     - name: Install required packages
-      apt:
-        pkg:
-        - curl
-        - git
-        - python3
-        - python3-pip
-        - python3-setuptools
-        - xclip
-        - zathura
-        - wget
-        - autorandr
-        - jq
-        - flameshot
-        - fzf
-        - zoxide
-        - bat
-        - ripgrep
-        - tmux
-        - fd-find
-        - exa
-        - neofetch
-        state: present
-      become: yes
-
+  become: yes
+  shell:
+    apt-get update
+    apt-get install -y curl git python3 python3-pip python3-setuptools xclip zathura wget autorandr jq flameshot fzf zoxide bat ripgrep tmux fd-find exa neofetch
+    
     - name: Clone the dotfiles repository
       git:
         repo: "https://{{ githubuser | urlencode }}:{{ githubpassword | urlencode }}@github.com/paysancorrezien/dotfiles.git"
