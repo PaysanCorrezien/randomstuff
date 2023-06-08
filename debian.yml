@@ -45,7 +45,9 @@
 
     - name: Install chezmoi
       shell:
-        cmd: sh -c "$(curl -fsLS get.chezmoi.io) -- -b /usr/local/bin"
+        cmd: |
+          sh -c "$(curl -fsLS get.chezmoi.io)"
+          mv ./bin/chezmoi /usr/local/bin/
 
     - name: Clone the dotfiles repository
       git:
