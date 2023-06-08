@@ -45,7 +45,7 @@
 
     - name: Install chezmoi
       shell:
-        cmd: sh -c "$(curl -fsLS get.chezmoi.io)"
+        cmd: sh -c "$(curl -fsLS get.chezmoi.io) -- -b /usr/local/bin"
 
     - name: Clone the dotfiles repository
       git:
@@ -62,10 +62,10 @@
         repo: "{{ ansible_env.HOME }}/.local/share/chezmoi"
 
     - name: Initialize chezmoi
-      command: "{{ ansible_env.HOME }}/.local/bin/chezmoi init --apply {{ githubuser }}"
+      command: chezmoi init --apply {{ githubuser }}
 
     - name: Update chezmoi
-      command: "{{ ansible_env.HOME }}/.local/bin/chezmoi update"
+      command: chezmoi update
 
     - name: Install NVM
       shell:
@@ -81,7 +81,10 @@
       shell:
         cmd: bash <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/bin/install)
 
-    - name: Change shell to zsh
+    - nameApologies for the cut-off, here is the remaining part of the playbook:
+
+```yaml
+      name: Change shell to zsh
       user:
         name: "{{ ansible_env.USER }}"
         shell: /usr/bin/zsh
