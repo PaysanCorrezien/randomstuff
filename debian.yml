@@ -1,5 +1,6 @@
 ---
 - hosts: localhost
+  become: yes
   vars_prompt:
     - name: "githubuser"
       prompt: "Enter your GitHub username"
@@ -9,10 +10,9 @@
       private: yes
   tasks:
     - name: Install required packages
-  become: yes
-  shell:
-    apt-get update
-    apt-get install -y curl git python3 python3-pip python3-setuptools xclip zathura wget autorandr jq flameshot fzf zoxide bat ripgrep tmux fd-find exa neofetch
+      shell: |
+        apt-get update
+        apt-get install -y curl git python3 python3-pip python3-setuptools xclip zathura wget autorandr jq flameshot fzf zoxide bat ripgrep tmux fd-find exa neofetch
     
     - name: Clone the dotfiles repository
       git:
