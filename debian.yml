@@ -47,6 +47,20 @@
       shell:
         cmd: sh -c "$(curl -fsLS get.chezmoi.io)"
 
+    - name: Clone the dotfiles repository
+      git:
+        repo: "https://{{ githubuser }}:{{ githubtoken }}@github.com/{{ githubuser }}/dotfiles.git"
+        dest: "{{ ansible_env.HOME }}/.local/share/chezmoi"
+        version: "main"
+        force: yes
+
+    - name: Ensure remote URL does not contain credentials
+      git_config:
+        name: "remote.origin.url"
+        value: "https://github.com/{{ githubuser }}/dotfiles.git"
+        scope: "local"
+        repo: "{{ ansible_env.HOME }}/.local/share/chezmoi"
+
     - name: Initialize chezmoi
       command: "{{ ansible_env.HOME }}/.local/bin/chezmoi init --apply {{ githubuser }}"
 
@@ -77,17 +91,3 @@
         dest: /etc/sudoers
         line: '{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL'
         validate: 'visudo -cf %s'
-
-    - name: Clone the dotfiles repository
-      git:
-        repo: "https://{{ githubuser }}:{{ githubtoken }}@github.com/{{ githubuser }}/dotfiles.git"
-        dest: "~/dotfiles"
-        version: "main"
-        force: yes
-
-    - name: Ensure remote URL does not contain credentials
-      git_config:
-        name: "remote.origin.url"
-        value: "https://github.com/{{ githubuser }}/dotfiles.git"
-        scope: "local"
-        repo: "~/dotfiles"
