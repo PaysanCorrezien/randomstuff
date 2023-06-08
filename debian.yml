@@ -31,6 +31,7 @@
         - exa
         - neofetch
         state: present
+      become: yes
 
     - name: Clone the dotfiles repository
       git:
