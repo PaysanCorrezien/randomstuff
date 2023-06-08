@@ -17,20 +17,6 @@
       shell: |
         git config --global http.postBuffer 524288000
 
-    - name: Clone the dotfiles repository
-      git:
-        repo: "https://{{ githubuser }}:{{ githubtoken }}@github.com/paysancorrezien/dotfiles.git"
-        dest: "~/dotfiles"
-        version: main
-        force: yes
-
-    - name: Ensure remote URL does not contain credentials
-      git_config:
-        name: remote.origin.url
-        value: "https://github.com/paysancorrezien/dotfiles.git"
-        scope: local
-        repo: "~/dotfiles"
-
     - name: Install python packages
       become: yes
       pip:
@@ -78,3 +64,17 @@
         dest: /etc/sudoers
         line: '{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL'
         validate: 'visudo -cf %s'
+
+    - name: Clone the dotfiles repository
+      git:
+        repo: "https://{{ githubuser }}:{{ githubtoken }}@github.com/{{ githubuser }}/dotfiles.git"
+        dest: "~/dotfiles"
+        version: main
+        force: yes
+
+    - name: Ensure remote URL does not contain credentials
+      git_config:
+        name: remote.origin.url
+        value: "https://github.com/{{ githubuser }}/dotfiles.git"
+        scope: local
+        repo: "~/dotfiles"
