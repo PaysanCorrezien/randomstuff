@@ -81,10 +81,7 @@
       shell:
         cmd: bash <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/bin/install)
 
-    - nameApologies for the cut-off, here is the remaining part of the playbook:
-
-```yaml
-      name: Change shell to zsh
+    - name: Change shell to zsh
       user:
         name: "{{ ansible_env.USER }}"
         shell: /usr/bin/zsh
