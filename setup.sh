@@ -12,4 +12,5 @@ sudo apt-get install -y ansible
 curl -L https://raw.githubusercontent.com/paysancorrezien/randomstuff/main/debian.yml --output playbook.yml
 
 # Execute the playbook
-ansible-playbook playbook.yml
+ansible-playbook playbook.yml -K
+
