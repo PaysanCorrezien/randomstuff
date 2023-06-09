@@ -1,6 +1,5 @@
 ---
 - hosts: localhost
-  become: yes
   vars:
     githubuser: "paysancorrezien"
   vars_prompt:
@@ -10,6 +9,7 @@
 
   tasks:
     - name: Install required packages
+      become: yes
       apt:
         pkg:
         - curl
@@ -44,6 +44,7 @@
         cmd: pip3 install -U pip
 
     - name: Install chezmoi
+      become: yes
       shell:
         cmd: |
           sh -c "$(curl -fsLS get.chezmoi.io)"
@@ -70,25 +71,30 @@
       command: chezmoi update
 
     - name: Install NVM
+      become: yes
       shell:
         cmd: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 
     - name: Install Node.js
+      become: yes
       shell: 
         cmd: |
           . "{{ ansible_env.HOME }}/.nvm/nvm.sh"
           nvm install node
 
     - name: Install Zap for Zsh
-      shell:
+      become: yes
+      shell: 
         cmd: bash <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/bin/install)
 
     - name: Change shell to zsh
+      become: yes
       user:
-        name: "{{ ansible_env.USER }}"
+        name: "{{ ansible_user }}"
         shell: /usr/bin/zsh
 
     - name: Allow ansible user to execute sudo without password
+      become: yes
       lineinfile:
         dest: /etc/sudoers
         line: '{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL'
