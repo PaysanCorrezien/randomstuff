@@ -6,9 +6,6 @@
     - name: "githubtoken"
       prompt: "GitHub Token"
       private: yes
-    - name: "ssh_passphrase"
-      prompt: "Enter your SSH key passphrase"
-      private: yes
 
   tasks:
     - name: Install required packages
@@ -53,39 +50,9 @@
           sh -c "$(curl -fsLS get.chezmoi.io)"
           mv ./bin/chezmoi /usr/local/bin/
 
-    - name: Generate SSH key
-      become: yes
-      user:
-        name: "{{ ansible_user }}"
-        generate_ssh_key: yes
-        ssh_key_bits: 2048
-        ssh_key_file: .ssh/id_rsa
-        ssh_key_passphrase: "{{ ssh_passphrase }}"
-
-    - name: Print the public key
-      command: cat /home/{{ ansible_user }}/.ssh/id_rsa.pub
-      register: public_key
-      changed_when: false
-      become: yes
-
-    - debug:
-        msg: "Please add the following public key to your GitHub account: {{ public_key.stdout }}"
-
-    - name: Pause to allow user to add key to GitHub
-      pause:
-        prompt: "Press enter to continue after you've added the key to GitHub"
-
-    - name: Start ssh-agent and add key
-      become: yes
-      shell: |
-        eval "$(ssh-agent -s)"
-        echo "{{ ssh_passphrase }}" | ssh-add /home/{{ ansible_user }}/.ssh/id_rsa
-      args:
-        executable: /bin/bash
-
-    - name: Clone the dotfiles repository
+    - name: Clone the dotfiles repository using HTTPS
       git:
-        repo: 'git@github.com:{{ githubuser }}/dotfiles.git'
+        repo: 'https://github.com/{{ githubuser }}/dotfiles.git'
         dest: "{{ ansible_env.HOME }}/.local/share/chezmoi"
         version: "main"
         force: yes
