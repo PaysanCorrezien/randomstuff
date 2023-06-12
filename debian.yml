@@ -56,6 +56,15 @@
         dest: "{{ ansible_env.HOME }}/.local/share/chezmoi"
         version: "main"
         force: yes
+    - name: Ensure chezmoi.toml exists with default values
+      ansible.builtin.copy:
+      dest: "~/.config/chezmoi/chezmoi.toml"
+      content: |
+        [git]
+        name = "Default Name"
+        email = "default@email.com"
+        gpg = "DefaultKey"
+        force: no
 
     - name: Initialize chezmoi
       command: chezmoi init --apply {{ githubuser }}
