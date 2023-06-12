@@ -58,7 +58,7 @@
         force: yes
 
     - name: Initialize chezmoi with ignore missing
-      command: chezmoi init --apply --ignore-missing {{ githubuser }}
+      command: chezmoi init --apply {{ githubuser }}
 
     - name: Update chezmoi
       command: chezmoi update
