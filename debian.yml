@@ -57,7 +57,7 @@
         version: "main"
         force: yes
 
-    - name: Initialize chezmoi with ignore missing
+    - name: Initialize chezmoi
       command: chezmoi init --apply {{ githubuser }}
 
     - name: Update chezmoi
