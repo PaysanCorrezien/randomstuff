@@ -49,7 +49,7 @@
         cmd: |
           sh -c "$(curl -fsLS get.chezmoi.io)"
           mv ./bin/chezmoi /usr/local/bin/
-          
+
     - name: Clone the dotfiles repository using HTTPS
       git:
         repo: 'https://github.com/{{ githubuser }}/dotfiles.git'
@@ -61,10 +61,8 @@
       ansible.builtin.copy:
         dest: "~/.config/chezmoi/chezmoi.toml"
         content: |
-          [git]
-          name = "Default Name"
-          email = "default@email.com"
-          gpg = "DefaultKey"
+          [data]
+          git = { name = "Default Name", email = "default@email.com", gpg = "DefaultKey" }
         force: no
 
     - name: Initialize chezmoi
