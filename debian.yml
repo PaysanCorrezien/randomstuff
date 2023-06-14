@@ -28,6 +28,7 @@
         - exa
         - neofetch
         - zsh
+        - unzip
         update_cache: yes
 
     - name: Install python packages
@@ -84,35 +85,42 @@
           USER: "{{ ansible_env.USER }}"
           SHELL: "/bin/bash"
 
-    - name: Install NVM
-      become: yes
-      shell:
-        cmd: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-        environment:
-          HOME: "{{ ansible_env.HOME }}"
-          USER: "{{ ansible_env.USER }}"
-          SHELL: "/bin/bash"
-
     - name: Wait for NVM to install
       wait_for:
         path: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
         state: present
 
-    - name: Install Node.js
+    - name: Install Node.js using NVM
       become: yes
-      shell: 
+      shell:
         cmd: |
           export NVM_DIR="{{ ansible_env.HOME }}/.nvm"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
           nvm install node
+          nvm use node
         environment:
           HOME: "{{ ansible_env.HOME }}"
           USER: "{{ ansible_env.USER }}"
           SHELL: "/bin/bash"
 
-    - name: Allow ansible user to execute sudo without password
+    - name: Install Fira Code Nerd Font
       become: yes
-      lineinfile:
-        dest: /etc/sudoers
-        line: '{{ ansible_env.USER }} ALL=(ALL) NOPASSWD: ALL'
-        validate: 'visudo -cf %s'
+      shell:
+        cmd:```yaml
+          fonts_dir="${HOME}/.local/share/fonts"
+          if [ ! -d "${fonts_dir}" ]; then
+              mkdir -p "${fonts_dir}"
+          fi
+
+          version=6.2
+          zip=FiraCode_${version}.zip
+          url=https://github.com/ryanoasis/nerd-fonts/releases/download/v${version}/FiraCode.zip
+          curl --fail --location --show-error ${url} --output ${zip}
+          unzip -o -q -d ${fonts_dir} ${zip}
+          rm ${zip}
+
+          fc-cache -f
+        environment:
+          HOME: "{{ ansible_env.HOME }}"
+          USER: "{{ ansible_env.USER }}"
+          SHELL: "/bin/bash"
