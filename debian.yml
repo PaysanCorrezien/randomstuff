@@ -76,6 +76,11 @@
       shell:
         cmd: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 
+    - name: Wait for NVM to install
+      wait_for:
+        path: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+        state: present
+
     - name: Install Node.js
       become: yes
       shell: 
@@ -100,3 +105,4 @@
         dest: /etc/sudoers
         line: '{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL'
         validate: 'visudo -cf %s'
+---
