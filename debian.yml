@@ -2,10 +2,6 @@
 - hosts: localhost
   vars:
     githubuser: "paysancorrezien"
-  vars_prompt:
-    - name: "githubtoken"
-      prompt: "GitHub Token"
-      private: yes
 
   tasks:
     - name: Install required packages
@@ -31,17 +27,18 @@
         - fd-find
         - exa
         - neofetch
+        - zsh
         update_cache: yes
-
-    - name: Increase Git buffer size
-      git_config:
-        name: http.postBuffer
-        value: 524288000
-        scope: global
 
     - name: Install python packages
       command:
         cmd: pip3 install -U pip
+
+    - name: Change shell to zsh
+      become: yes
+      user:
+        name: "{{ ansible_user }}"
+        shell: /usr/bin/zsh
 
     - name: Install chezmoi
       become: yes
@@ -74,7 +71,7 @@
     - name: Install NVM
       become: yes
       shell:
-        cmd: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+        cmd: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 
     - name: Wait for NVM to install
       wait_for:
@@ -93,16 +90,9 @@
       shell: 
         cmd: bash <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/bin/install)
 
-    - name: Change shell to zsh
-      become: yes
-      user:
-        name: "{{ ansible_user }}"
-        shell: /usr/bin/zsh
-
     - name: Allow ansible user to execute sudo without password
       become: yes
       lineinfile:
         dest: /etc/sudoers
         line: '{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL'
         validate: 'visudo -cf %s'
-
