@@ -1,48 +1,124 @@
----
 - hosts: localhost
+  become: true
   vars:
     githubuser: "paysancorrezien"
 
   tasks:
-    - name: Install required packages
+    - name: Install required system packages
       become: yes
       apt:
         pkg:
-        - curl
-        - git
-        - python3
-        - python3-pip
-        - python3-setuptools
-        - xclip
-        - zathura
-        - wget
-        - autorandr
-        - jq
-        - flameshot
-        - fzf
-        - zoxide
-        - bat
-        - ripgrep
-        - tmux
-        - fd-find
-        - exa
-        - neofetch
-        - zsh
+          - curl
+          - git
+          - python3
+          - python3-pip
+          - python3-setuptools
+          - python3-venv
+          - xclip
+          - zathura
+          - wget
+          - autorandr
+          - jq
+          - flameshot
+          - fzf
+          - zoxide
+          - bat
+          - ripgrep
+          - tmux
+          - exa
+          - neofetch
+          - zsh
         update_cache: yes
+
+    - name: Install NVM
+      shell:
+        cmd: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+      become_user: "{{ ansible_env.USER }}"
+      args:
+        executable: /bin/bash
+
+    - name: Wait for NVM to install
+      wait_for:
+        path: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+        state: present
+
+    - name: Install Node.js
+      become: false
+      shell: 
+        cmd: |
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          nvm install node
+      become_user: "{{ ansible_env.USER }}"
+      args:
+        executable: /bin/bash
+
+    - name: Install python packages
+      command:
+        cmd: pip3 install -U pip
 
     - name: Install python packages
       command:
         cmd: pip3 install -U pip
 
     - name: Change shell to zsh
-      become: yes
       shell: chsh -s /usr/bin/zsh "{{ ansible_env.USER }}" 
       args:
         executable: /bin/bash
 
     - name: Install Zap for Zsh
+      become: false  
       shell: 
         cmd: zsh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/release-v1/install.zsh)
+      become_user: "{{ ansible_env.USER }}"
+      args:
+        executable: /bin/bash
+
+    - name: Download Neovim release from GitHub
+      get_url:
+        url: "https://github.com/neovim/neovim/releases/download/v0.9.0/nvim-linux64.tar.gz"
+        dest: "/tmp/nvim-linux64.tar.gz"
+      become_user: "{{ ansible_env.USER }}"
+
+    - name: Extract Neovim release
+      unarchive:
+        src: "/tmp/nvim-linux64.tar.gz"
+        dest: "/usr/local/"
+        remote_src: yes
+
+    - name: Move Neovim binary to /usr/local/bin
+      command: mv /usr/local/nvim-linux64/bin/nvim /usr/local/bin/
+      become: true  
+
+    - name: Refresh shell
+      shell: . /etc/profile
+      args:
+        executable: /bin/bash
+
+    - name: Create Python virtual environment
+      become: false
+      command: python3 -m venv ~/.my_venv
+
+    - name: Activate virtual environment
+      become: false
+      shell: . ~/.my_venv/bin/activate
+      args:
+        executable: /bin/bash
+
+    - name: Install Rust
+      become: false
+      shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+    - name: Install LunarVim
+      become: false
+      shell:
+        cmd: |
+          export LVIM_REPO="LunarVim/LunarVim"
+          cargo install fd-find
+          LV_BRANCH='release-1.3/neovim-0.9' bash <(curl -s https://raw.githubusercontent.com/LunarVim/LunarVim/release-1.3/neovim-0.9/utils/installer/install.sh) --yes --install-dependencies > /tmp/lvim_install.log 2>&1
+          cd ~/.local/share/lunarvim
+          bash lvim/utils/installer/install_bin.sh
+          echo "LunarVim installed successfully"
       become_user: "{{ ansible_env.USER }}"
       args:
         executable: /bin/bash
@@ -61,6 +137,12 @@
         version: "main"
         force: yes
 
+    - name: Ensure chezmoi config directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/.config/chezmoi"
+        state: directory
+        mode: '0755'
+
     - name: Ensure chezmoi.toml exists with default values
       ansible.builtin.copy:
         dest: "{{ ansible_env.HOME }}/.config/chezmoi/chezmoi.toml"
@@ -74,28 +156,6 @@
 
     - name: Update chezmoi
       command: chezmoi update
-
-    - name: Install NVM
-      shell:
-        cmd: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
-      become_user: "{{ ansible_env.USER }}"
-      args:
-        executable: /bin/bash
-
-    - name: Wait for NVM to install
-      wait_for:
-        path: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
-        state: present
-
-    - name: Install Node.js
-      shell: 
-        cmd: |
-          export NVM_DIR="{{ ansible_env.HOME }}/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-          nvm install node
-      become_user: "{{ ansible_env.USER }}"
-      args:
-        executable: /bin/bash
 
     - name: Install Fira Code Nerd Font
       shell:
