@@ -44,7 +44,7 @@
       become: yes
       shell:
         cmd: |
-          sh -c "$(curl -fsLS get.chezmoi.io)"
+          sh -c "$(curl -fsLS git.io/chezmoi)"
           mv ./bin/chezmoi /usr/local/bin/
 
     - name: Clone the dotfiles repository using HTTPS
@@ -56,7 +56,7 @@
 
     - name: Ensure chezmoi.toml exists with default values
       ansible.builtin.copy:
-        dest: "~/.config/chezmoi/chezmoi.toml"
+        dest: "{{ ansible_env.HOME }}/.config/chezmoi/chezmoi.toml"
         content: |
           [data]
           git = { name = "Default Name", email = "default@email.com", gpg = "DefaultKey" }
@@ -72,6 +72,10 @@
       become: yes
       shell:
         cmd: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+        environment:
+          HOME: "{{ ansible_env.HOME }}"
+          USER: "{{ ansible_user }}"
+          SHELL: "/bin/bash"
 
     - name: Wait for NVM to install
       wait_for:
@@ -82,8 +86,13 @@
       become: yes
       shell: 
         cmd: |
-          . "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+          export NVM_DIR="{{ ansible_env.HOME }}/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
           nvm install node
+        environment:
+          HOME: "{{ ansible_env.HOME }}"
+          USER: "{{ ansible_user }}"
+          SHELL: "/bin/bash"
 
     - name: Install Zap for Zsh
       become: yes
