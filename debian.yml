@@ -36,9 +36,9 @@
 
     - name: Change shell to zsh
       become: yes
-      user:
-        name: "{{ ansible_env.USER }}"
-        shell: /usr/bin/zsh
+      shell: chsh -s /usr/bin/zsh "{{ ansible_env.USER }} 
+      args:
+        executable: /bin/bash
         
     - name: Install Zap for Zsh
       become: yes
