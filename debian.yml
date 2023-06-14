@@ -39,11 +39,13 @@
       shell: chsh -s /usr/bin/zsh "{{ ansible_env.USER }}" 
       args:
         executable: /bin/bash
-        
+
     - name: Install Zap for Zsh
       become: yes
       shell: 
-        cmd: bash <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/bin/install)
+        cmd: zsh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/release-v1/install.zsh)
+      args:
+        executable: /bin/bash
 
     - name: Install chezmoi
       become: yes
@@ -72,6 +74,15 @@
 
     - name: Update chezmoi
       command: chezmoi update
+
+    - name: Install NVM
+      become: yes
+      shell:
+        cmd: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+        environment:
+          HOME: "{{ ansible_env.HOME }}"
+          USER: "{{ ansible_env.USER }}"
+          SHELL: "/bin/bash"
 
     - name: Install NVM
       become: yes
