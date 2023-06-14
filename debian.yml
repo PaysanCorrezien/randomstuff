@@ -37,7 +37,7 @@
     - name: Change shell to zsh
       become: yes
       user:
-        name: "{{ ansible_user }}"
+        name: "{{ ansible_env.USER }}"
         shell: /usr/bin/zsh
         
     - name: Install Zap for Zsh
@@ -79,7 +79,7 @@
         cmd: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
         environment:
           HOME: "{{ ansible_env.HOME }}"
-          USER: "{{ ansible_user }}"
+          USER: "{{ ansible_env.USER }}"
           SHELL: "/bin/bash"
 
     - name: Wait for NVM to install
@@ -96,12 +96,12 @@
           nvm install node
         environment:
           HOME: "{{ ansible_env.HOME }}"
-          USER: "{{ ansible_user }}"
+          USER: "{{ ansible_env.USER }}"
           SHELL: "/bin/bash"
 
     - name: Allow ansible user to execute sudo without password
       become: yes
       lineinfile:
         dest: /etc/sudoers
-        line: '{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL'
+        line: '{{ ansible_env.USER }} ALL=(ALL) NOPASSWD: ALL'
         validate: 'visudo -cf %s'
