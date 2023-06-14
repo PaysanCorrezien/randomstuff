@@ -39,6 +39,11 @@
       user:
         name: "{{ ansible_user }}"
         shell: /usr/bin/zsh
+        
+    - name: Install Zap for Zsh
+      become: yes
+      shell: 
+        cmd: bash <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/bin/install)
 
     - name: Install chezmoi
       become: yes
@@ -93,11 +98,6 @@
           HOME: "{{ ansible_env.HOME }}"
           USER: "{{ ansible_user }}"
           SHELL: "/bin/bash"
-
-    - name: Install Zap for Zsh
-      become: yes
-      shell: 
-        cmd: bash <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/bin/install)
 
     - name: Allow ansible user to execute sudo without password
       become: yes
