@@ -36,7 +36,7 @@
 
     - name: Change shell to zsh
       become: yes
-      shell: chsh -s /usr/bin/zsh "{{ ansible_env.USER }} 
+      shell: chsh -s /usr/bin/zsh "{{ ansible_env.USER }}" 
       args:
         executable: /bin/bash
         
