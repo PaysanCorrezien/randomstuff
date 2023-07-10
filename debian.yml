@@ -10,6 +10,7 @@
         pkg:
           - curl
           - git
+          - unzip
           - python3
           - python3-pip
           - python3-setuptools
@@ -86,9 +87,15 @@
         dest: "/usr/local/"
         remote_src: yes
 
-    - name: Move Neovim binary to /usr/local/bin
-      command: mv /usr/local/nvim-linux64/bin/nvim /usr/local/bin/
-      become: true  
+    - name: Add Neovim binary to current shell PATH
+      shell: |
+        export PATH="$PATH:/usr/local/nvim-linux64/bin"
+        # Add other commands that depend on the updated PATH here
+      become_user: "{{ ansible_env.USER }}"
+
+    # - name: Move Neovim binary to /usr/local/bin
+    #   command: mv /usr/local/nvim-linux64/bin/nvim /usr/local/bin/
+    #   become: true  
 
     - name: Refresh shell
       shell: . /etc/profile
@@ -151,32 +158,49 @@
           git = { name = "Default Name", email = "default@email.com", gpg = "DefaultKey" }
         force: no
 
-    - name: Initialize chezmoi
-      command: chezmoi init --apply {{ githubuser }}
+    # - name: Initialize chezmoi
+    #   command: chezmoi init --apply {{ githubuser }}
 
-    - name: Update chezmoi
-      command: chezmoi update
+    # - name: Update chezmoi
+    #   command: chezmoi update
 
-    - name: Install Fira Code Nerd Font
+    - name: Download and install Fira Code Nerd Font
       shell:
         cmd: |
-          fonts_dir="{{ ansible_env.HOME }}/.local/share/fonts"
+          fonts_dir="{{ lookup('env', 'HOME') }}/.local/share/fonts"
+          echo "Fonts directory: ${fonts_dir}"
           if [ ! -d "${fonts_dir}" ]; then
+              echo "Creating fonts directory..."
               mkdir -p "${fonts_dir}"
           fi
           version=6.2
           zip=Fira_Code_v${version}.zip
+          echo "Downloading zip file..."
           curl --fail --location --show-error https://github.com/tonsky/FiraCode/releases/download/${version}/${zip} --output ${zip}
+          if [ $? -eq 0 ]; then
+              echo "Download successful!"
+          else
+              echo "Download failed!"
+              exit 1
+          fi
+          echo "Unzipping file..."
           unzip -o -q -d ${fonts_dir} ${zip}
-          rm ${zip}
+          if [ $? -eq 0 ]; then
+              echo "Unzip successful!"
+          else
+              echo "Unzip failed!"
+              exit 1
+          fi
+          echo "Deleting zip file..."
+          rm -f ${zip}
+          echo "Refreshing font cache..."
           fc-cache -f
-      become_user: "{{ ansible_env.USER }}"
-      args:
-        executable: /bin/bash
 
     - name: Allow ansible user to execute sudo without password
       become: yes
       lineinfile:
-        dest: /etc/sudoers
-        line: '{{ ansible_env.USER }} ALL=(ALL) NOPASSWD: ALL'
+        dest: /etc/sudoers.d/90-ansible-user
+        create: yes
+        line: '{{ lookup("env", "USER") }} ALL=(ALL) NOPASSWD: ALL'
         validate: 'visudo -cf %s'
+
