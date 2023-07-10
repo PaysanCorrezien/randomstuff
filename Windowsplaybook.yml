@@ -1,0 +1,83 @@
+---
+- name: Configure Windows machine
+  hosts: localhost
+  gather_facts: no
+  connection: local
+  become: yes
+  become_method: runas
+  become_user: System
+
+  vars_prompt:
+    - name: "username"
+      prompt: "What is your username?"
+      private: no
+
+    - name: "password"
+      prompt: "What is your password?"
+      private: yes
+
+  tasks:
+    - name: Install Chocolatey
+      win_shell: |
+        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+      args:
+        executable: powershell.exe
+
+    - name: Install packages with Chocolatey
+      win_chocolatey:
+        name:
+          - powertoys
+          - obsidian
+          - keepassxc
+          - git
+          - 7zip
+          - python3
+          - pip
+          - autohotkey
+          - wireshark
+          - cmake
+          - ninja
+          - make
+          - greenshot
+          - microsoft-windows-terminal
+          - office365business
+          - linphone
+        state: latest
+
+    - name: Download and install DLL from GitHub
+      win_get_url:
+        url: 'https://github.com/paysancorrezien/randomstuff/raw/main/your_dll_file.dll'
+        dest: 'C:\userconfig\your_dll_file.dll'
+
+    - name: Register DLL
+      win_shell: |
+        regsvr32.exe /s C:\userconfig\your_dll_file.dll
+      args:
+        executable: cmd.exe
+
+    - name: Download and install custom keyboard layout from GitHub
+      win_get_url:
+        url: 'https://github.com/paysancorrezien/randomstuff/raw/main/your_keyboard_layout_file.klc'
+        dest: 'C:\userconfig\your_keyboard_layout_file.klc'
+
+    - name: Uninstall unwanted apps
+      win_shell: |
+        Get-AppxPackage *windowscommunicationsapps* | Remove-AppxPackage # For Windows Mail
+        Get-AppxPackage *xboxapp* | Remove-AppxPackage # For Xbox
+        Get-AppxPackage *clipchamp* | Remove-AppxPackage # For Clipchamp
+        Get-AppxPackage *solitaire* | Remove-AppxPackage # For Solitaire
+        Get-AppxPackage *windowsstore* | Remove-AppxPackage # For Windows Store
+        Get-AppxPackage *xboxgamebar* | Remove-AppxPackage # For Xbox Game Bar
+      args:
+        executable: powershell.exe
+
+    - name: Download AutoHotkey script from GitHub
+      win_get_url:
+        url: 'https://github.com/paysancorrezien/randomstuff/raw/main/your_script.ahk'
+        dest: 'C:\userconfig\your_script.ahk'
+
+    - name: Create shortcut to AutoHotkey script in Startup folder
+      win_shortcut:
+        src: 'C:\userconfig\your_script.ahk'
+        dest: 'C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\your_script.lnk'
+
