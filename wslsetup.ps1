@@ -33,6 +33,6 @@ wsl git clone https://github.com/PaysanCorrezien/randomstuff /home/$($username)/
 Write-Host "Executing the setup.sh script..."
 wsl bash /home/$($username)/install/setup.sh
 
-Write-Host "Running the Ansible playbook on the Windows system..."
-wsl ansible-playbook -i "//wsl.localhost/Debian/home/$($username)e/install/localhost," /home/$($username)/install/windows.yml
+# Write-Host "Running the Ansible playbook on the Windows system..."
+# wsl ansible-playbook -i "//wsl.localhost/Debian/home/$($username)e/install/localhost," /home/$($username)/install/windows.yml
 
