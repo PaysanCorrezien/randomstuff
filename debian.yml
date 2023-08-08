@@ -54,14 +54,6 @@
       args:
         executable: /bin/bash
 
-    - name: Install python packages
-      command:
-        cmd: pip3 install -U pip
-
-    - name: Install python packages
-      command:
-        cmd: pip3 install -U pip
-
     - name: Change shell to zsh
       shell: chsh -s /usr/bin/zsh "{{ ansible_env.USER }}" 
       args:
@@ -196,11 +188,4 @@
           echo "Refreshing font cache..."
           fc-cache -f
 
-    - name: Allow ansible user to execute sudo without password
-      become: yes
-      lineinfile:
-        dest: /etc/sudoers.d/90-ansible-user
-        create: yes
-        line: '{{ lookup("env", "USER") }} ALL=(ALL) NOPASSWD: ALL'
-        validate: 'visudo -cf %s'
 
