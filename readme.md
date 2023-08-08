@@ -20,16 +20,16 @@ curl -L https://raw.githubusercontent.com/paysancorrezien/randomstuff/main/setup
 # Todo 
 
 ## Linux side
-- [] Lunarvim install adapt
-- [] nerdfonts install
-- [] setup git 
-- [] secrets
-- [] docs
+- [ ] Lunarvim install adapt
+- [ ] nerdfonts install run as user 
+- [ ] setup git 
+- [ ] secrets
+- [ ] docs
+- [ ] python dep for lunarvim wrong
+- [ ] rewrite in bash 
 
 ## Windows
-- [] test drive
-- [] Recup dll keybs
-- [] Download and execute real cleanup utils to debloat
-- [] rebuild and upload desktopmgr dll
-- [] Build the complete autohotkey script
-- [] Configure windows terminal , upload json with correct conf , automatic install json config file
+- [ ] install nerdfonts too 
+- [ ] Download and execute real cleanup utils to debloat
+- [ ] reboot after install wsl 
+- [ ] Configure windows terminal ( install + set nerdfonts ) , upload json with correct conf , automatic install json config file
