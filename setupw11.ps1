@@ -219,10 +219,10 @@ Set-ProgramInstaller
 
 # Define a list of programs to install
 $programs = @("powertoys", "powershell-core", "python3", "7zip", 
-              "teamviewer", "autohotkey", "dellcommandupdate", "dotnet3.5", 
+              "teamviewer", "autohotkey", "dotnet3.5", 
               "sql-server-management-studio", "putty", "wireshark", "keepassxc", "brave", 
               "obsidian", "greenshot", "keepassxc", "RegShot", "TreeSizeFree",
-              "procmon", "winlogbeat", "LogParser", "git", "github-desktop")
+              "procmon", "winlogbeat", "LogParser", "git", "github-desktop","pandoc","mremoteng","quicklook" )
 
 # Call the function to install each program
 foreach ($program in $programs) {
