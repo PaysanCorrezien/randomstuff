@@ -16,4 +16,4 @@ wsl sudo apt install -y git
 wsl git clone https://github.com/PaysanCorrezien/randomstuff /home/$($username)/install
 
 Write-Host "Executing the setup.sh script..."
-wsl bash /home/$($username)/install/setup.sh
+wsl bash /home/$($username)/install/debian.sh
