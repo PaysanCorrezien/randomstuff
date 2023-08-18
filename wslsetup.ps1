@@ -1,5 +1,5 @@
 #$env:username
-$username = "dylan"
+$username = $env:username
 
 Write-Host "Enabling WSL and Virtual Machine Platform..."
 Start-Process -Wait -NoNewWindow -FilePath "dism.exe" -ArgumentList "/online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart"
@@ -11,28 +11,26 @@ wsl --set-default-version 2
 Write-Host "Installing Debian..."
 wsl --install -d Debian
 
-Write-Host "Installing curl and setting passwordless sudo..."
-wsl sudo apt update
-wsl sudo apt install curl -y
-# echo "$($username) ALL=(ALL:ALL) NOPASSWD: ALL" | wsl sudo tee /etc/sudoers.d/$($username)
-# echo "$env:USERNAME ALL=(ALL:ALL) NOPASSWD: ALL" | wsl sudo tee /etc/sudoers.d/$env:USERNAME
-# Prompt for the WSL sudo password
-$credential = Get-Credential -Message "Enter your WSL sudo password" -UserName "$($username)"
+# Get the directory of the currently executing script
+$currentDir = $PSScriptRoot
 
-# Store the sudo password in a variable
-$sudoPassword = $credential.Password | ConvertFrom-SecureString -AsPlainText
+# Construct the full path to wslsetup.ps1
+$wslSetupScriptPath = Join-Path -Path $currentDir -ChildPath "wslsetup.ps1"
 
-# Use the provided password to execute the sudo command in WSL
-echo $sudoPassword | wsl sudo -S sh -c "echo '$username ALL=(ALL:ALL) NOPASSWD: ALL' > /etc/sudoers.d/$username"
+# Check if wslsetup.ps1 exists in the directory
+if (Test-Path $wslSetupScriptPath) {
+Write-Host "Create AT to execute rest of install"
+# Define the date-time for one day from now
+$endDate = (Get-Date).AddDays(1).ToString("yyyy-MM-ddTHH:mm:ss")
 
+# Register the next script to run upon startup using Task Scheduler
+$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -File $wslSetupScriptPath"
+$trigger = New-ScheduledTaskTrigger -AtStartup -RepetitionDuration ([TimeSpan]::FromDays(1)) -EndBoundary $endDate
+Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "AfterRebootScript" -User "NT AUTHORITY\SYSTEM"
+} else {
+    Write-Host "Error: wslsetup.ps1 not found in the current directory."
+    exit 1
+}
 
-Write-Host "Downloading your Git repository..."
-wsl sudo apt install -y git
-wsl git clone https://github.com/PaysanCorrezien/randomstuff /home/$($username)/install
-
-Write-Host "Executing the setup.sh script..."
-wsl bash /home/$($username)/install/setup.sh
-
-# Write-Host "Running the Ansible playbook on the Windows system..."
-# wsl ansible-playbook -i "//wsl.localhost/Debian/home/$($username)e/install/localhost," /home/$($username)/install/windows.yml
-
+Write-Host "Rebooting the system to finalize changes..."
+Restart-Computer -Wait
