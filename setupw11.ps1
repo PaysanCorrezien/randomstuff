@@ -14,9 +14,9 @@ $ahkScriptUrl = 'https://github.com/PaysanCorrezien/randomstuff/raw/main/w11virt
 
 $registryKeys = @(
     @{
-        Key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
+        Key = 'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
         Value = @{
-            'TaskbarAl' = 1
+            'TaskbarAl' = 0
             'TaskbarGlomLevel' = 2
             'NavPaneShowAllFolders' = 1
             'Hidden' = 1
@@ -24,43 +24,44 @@ $registryKeys = @(
         }
     },
     @{
-        Key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer'
+        Key = 'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer'
         Value = @{
             'TaskbarGlomming' = 0
         }
     },
     @{
-        Key = 'HKCR:\*\shell\copyfullpath'
+        Key = 'HKEY_CLASSES_ROOT\*\shell\copyfullpath'
         Value = @{
             '(Default)' = 'Copy Full Path'
         }
     },
     @{
-        Key = 'HKCR:\*\shell\copyfullpath\command'
+        Key = 'HKEY_CLASSES_ROOT\*\shell\copyfullpath\command'
         Value = @{
             '(Default)' = 'cmd /c echo %1 | clip'
         }
     },
     @{
-        Key = 'HKCR:\*\shell\copyfilename'
+        Key = 'HKEY_CLASSES_ROOT\*\shell\copyfilename'
         Value = @{
             '(Default)' = 'Copy Filename'
         }
     },
-    @{
-        Key = 'HKCR:\*\shell\copyfilename\command'
+  @{
+        Key = 'HKEY_CLASSES_ROOT\*\shell\copyfilename\command'
         Value = @{
-            '(Default)' = 'cmd.exe /c "for %%A in ("%1") do @echo %%~nxA | clip"'
+            '(Default)' = 'powershell.exe -NoProfile -ExecutionPolicy Bypass -File ''C:\userconfig\copyfile.ps1'' \"\"%1\"\"'
         }
     },
     @{
-        Key = 'HKCU:\Keyboard Layout\Toggle'
+        Key = 'HKEY_CURRENT_USER\Keyboard Layout\Toggle'
         Value = @{
             'Language Hotkey' = 1
             'Layout Hotkey' = 1
         }
     }
 )
+
 
 
 function RestartAndContinue {
@@ -119,17 +120,26 @@ function CreateMultiplesRegistryKey($registryKeys) {
     foreach ($key in $registryKeys) {
         $keyName = $key.Key
         $property = $key.Value
-        $propertyType = $property.GetType().Name
-
-        if (!(Test-Path $keyName)) {
-            New-Item -Path $keyName -Force | Out-Null
-        }
 
         foreach ($name in $property.Keys) {
-            Set-ItemProperty -Path $keyName -Name $name -Value $property.$name -Type $propertyType -Force
+            $value = $property[$name]
+            
+            if ($name -eq '(Default)') {
+                $command = "reg add `"$keyName`" /ve /d `"$value`" /f"
+            } else {
+                if ($value -is [int]) {
+                    $command = "reg add `"$keyName`" /v `"$name`" /t REG_DWORD /d $value /f"
+                } else {
+                    $command = "reg add `"$keyName`" /v `"$name`" /d `"$value`" /f"
+                }
+            }
+            
+            Write-Host "Executing: $command" # This will display the command
+            Invoke-Expression $command
         }
     }
 }
+
 
 function Set-LocalAdmin {
     # Check if the user wants to set a local admin
