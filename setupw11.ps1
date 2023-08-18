@@ -233,7 +233,7 @@ foreach ($program in $programs) {
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
 # Call the function with the list of registry keys
-# CreateMultiplesRegistryKey -registryKeys $registryKeys
+CreateMultiplesRegistryKey -registryKeys $registryKeys
 
 # Download the DLL
 Invoke-WebRequest -Uri $dllUrl -OutFile $dllDest
