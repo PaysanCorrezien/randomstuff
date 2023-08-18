@@ -15,7 +15,7 @@ wsl --install -d Debian
 $currentDir = $PSScriptRoot
 
 # Construct the full path to wslsetup.ps1
-$wslSetupScriptPath = Join-Path -Path $currentDir -ChildPath "wslsetup.ps1"
+$wslSetupScriptPath = Join-Path -Path $currentDir -ChildPath "debiansetup.ps1"
 
 # Check if wslsetup.ps1 exists in the directory
 if (Test-Path $wslSetupScriptPath) {
@@ -25,8 +25,9 @@ $endDate = (Get-Date).AddDays(1).ToString("yyyy-MM-ddTHH:mm:ss")
 
 # Register the next script to run upon startup using Task Scheduler
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -File $wslSetupScriptPath"
-$trigger = New-ScheduledTaskTrigger -AtStartup -RepetitionDuration ([TimeSpan]::FromDays(1)) -EndBoundary $endDate
-Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "AfterRebootScript" -User "NT AUTHORITY\SYSTEM"
+$trigger = New-ScheduledTaskTrigger -AtLogon -RepetitionDuration ([TimeSpan]::FromDays(1)) -EndBoundary $endDate
+Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "AfterRebootScript" -User $env:USERNAME
+
 } else {
     Write-Host "Error: wslsetup.ps1 not found in the current directory."
     exit 1
