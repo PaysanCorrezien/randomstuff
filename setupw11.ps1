@@ -28,8 +28,40 @@ $registryKeys = @(
         Value = @{
             'TaskbarGlomming' = 0
         }
+    },
+    @{
+        Key = 'HKCR:\*\shell\copyfullpath'
+        Value = @{
+            '(Default)' = 'Copy Full Path'
+        }
+    },
+    @{
+        Key = 'HKCR:\*\shell\copyfullpath\command'
+        Value = @{
+            '(Default)' = 'cmd /c echo %1 | clip'
+        }
+    },
+    @{
+        Key = 'HKCR:\*\shell\copyfilename'
+        Value = @{
+            '(Default)' = 'Copy Filename'
+        }
+    },
+    @{
+        Key = 'HKCR:\*\shell\copyfilename\command'
+        Value = @{
+            '(Default)' = 'cmd.exe /c "for %%A in ("%1") do @echo %%~nxA | clip"'
+        }
+    },
+    @{
+        Key = 'HKCU:\Keyboard Layout\Toggle'
+        Value = @{
+            'Language Hotkey' = 1
+            'Layout Hotkey' = 1
+        }
     }
 )
+
 
 function RestartAndContinue {
     param (
