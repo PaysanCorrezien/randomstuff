@@ -87,10 +87,11 @@ install_lunarvim() {
 	local neovim_version
 	local lunarvim_branch
  	cargo install fd-findcargo install fd-find
-	lunarvim_version=$(get_latest_release "LunarVim/LunarVim" | sed 's/v//')
-	neovim_version=$(get_latest_release "neovim/neovim" | sed 's/v//')
+	# This will remove the '.0' from version strings like '1.3.0'
+	lunarvim_version_simple=$(get_latest_release "LunarVim/LunarVim" | sed 's/v\([0-9]*\.[0-9]*\)\.0/\1/')
+	neovim_version_simple=$(get_latest_release "neovim/neovim" | sed 's/v\([0-9]*\.[0-9]*\)\.0/\1/')
 
-	lunarvim_branch="release-${lunarvim_version%.*}/neovim-${neovim_version%.*}"
+	lunarvim_branch="release-${lunarvim_version_simple}/neovim-${neovim_version_simple}"
 
  	if ! check_branch_exists "LunarVim/LunarVim" "$lunarvim_branch"; then
         print_error "Branch $lunarvim_branch does not exist!"
