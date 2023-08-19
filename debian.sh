@@ -99,7 +99,7 @@ install_lunarvim() {
 
 	echo "Installing LunarVim for branch: $lunarvim_branch"
 
-	LV_BRANCH=$lunarvim_branch bash <(curl -s "https://raw.githubusercontent.com/LunarVim/LunarVim/${lunarvim_branch}/utils/installer/install.sh") || print_error "Failed to install LunarVim"
+	LV_BRANCH=$lunarvim_branch bash <(curl -s "https://raw.githubusercontent.com/LunarVim/LunarVim/master/utils/installer/install.sh") || print_error "Failed to install LunarVim"
 }
 
 # WARNING: NOT realy working on domain ?
