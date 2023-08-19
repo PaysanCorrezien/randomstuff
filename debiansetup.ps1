@@ -13,7 +13,8 @@ echo $sudoPassword | wsl sudo -S sh -c "echo '$username ALL=(ALL:ALL) NOPASSWD: 
 
 Write-Host "Downloading your Git repository..."
 wsl sudo apt install -y git
-wsl git clone https://github.com/PaysanCorrezien/randomstuff /home/$($username)/install
+# wsl git clone https://github.com/PaysanCorrezien/randomstuff /home/$($username)/install
+wsl bash -c 'git clone https://github.com/PaysanCorrezien/randomstuff /home/$USER/install'
 
 Write-Host "Executing the setup.sh script..."
 wsl bash /home/$($username)/install/debian.sh
