@@ -237,6 +237,7 @@ install_nvm() {
 
 main() {
 	install_packages
+	sudoers_configuration
 	install_nvm
 	install_node
 	change_shell
@@ -256,7 +257,7 @@ main() {
 	install_lazygit
 	install_powershell_on_debian
 	install_fira_code_font
-	sudoers_configuration
+	
 }
 
 # Call the main function
