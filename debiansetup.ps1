@@ -8,4 +8,5 @@ wsl sudo apt install -y git
 wsl bash -c 'git clone https://github.com/PaysanCorrezien/randomstuff /home/$USER/install'
 
 Write-Host "Executing the setup.sh script..."
-wsl bash /home/$($username)/install/debian.sh
+wsl bash -c 'chmod +x /home/$USER/install/debian.sh'
+wsl bash -c '/home/$USER/install/debian.sh'
