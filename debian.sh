@@ -70,17 +70,32 @@ install_rust() {
 	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh || print_error "Failed to install Rust"
 }
 
+check_branch_exists() {
+    local repo=$1
+    local branch=$2
+    local branches
+
+    branches=$(curl --silent "https://api.github.com/repos/$repo/branches" | grep '"name":' | sed -E 's/.*"([^"]+)".*/\1/')
+
+    [[ $branches == *"$branch"* ]]
+}
+
 install_lunarvim() {
 	echo "Installing LunarVim..."
 
 	local lunarvim_version
 	local neovim_version
 	local lunarvim_branch
-
+ 	cargo install fd-findcargo install fd-find
 	lunarvim_version=$(get_latest_release "LunarVim/LunarVim" | sed 's/v//')
 	neovim_version=$(get_latest_release "neovim/neovim" | sed 's/v//')
 
-	lunarvim_branch="release-${lunarvim_version}/neovim-${neovim_version}"
+	lunarvim_branch="release-${lunarvim_version%.*}/neovim-${neovim_version%.*}"
+
+ 	if ! check_branch_exists "LunarVim/LunarVim" "$lunarvim_branch"; then
+        print_error "Branch $lunarvim_branch does not exist!"
+        return 1
+	fi
 
 	echo "Installing LunarVim for branch: $lunarvim_branch"
 
