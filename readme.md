@@ -1,14 +1,18 @@
-
 # Install
 On windows, launch powershell as admin on fresh machine :
 
 ```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; iex (iwr -UseBasicParsing -Uri 'https://raw.githubusercontent.com/PaysanCorrezien/randomstuff/main/initialise.ps1').Content
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; iex (iwr -UseBasicParsing -Uri 'https://raw.githubusercontent.com/PaysanCorrezien/randomstuff/main/wslsetup.ps1').Content
 ``` 
 
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; iex (iwr -UseBasicParsing -Uri 'https://raw.githubusercontent.com/PaysanCorrezien/randomstuff/main/setupw11.ps1').Content
+``` 
 
-## will be removed once script tested 
+Once Wsl is running :
+
 ```bash
+sudo apt update && sudo apt upgrade
 sudo apt install curl
 ```
 
@@ -19,17 +23,14 @@ curl -L https://raw.githubusercontent.com/paysancorrezien/randomstuff/main/setup
 
 # Todo 
 
-## Linux side
+## Linux Side
 - [ ] Lunarvim install adapt
-- [ ] nerdfonts install run as user 
-- [ ] setup git 
-- [ ] secrets
-- [ ] docs
-- [ ] python dep for lunarvim wrong
-- [ ] rewrite in bash 
+- [ ] Dont prompt for sudoers multi time for wsl setup
+- [ ] make this work with less interaction
+- [ ] Manage the multiple reboot needed
+- [ ] python dep for Lunarvim wrong ? 
 
 ## Windows
-- [ ] install nerdfonts too 
+
 - [ ] Download and execute real cleanup utils to debloat
-- [ ] reboot after install wsl 
-- [ ] Configure windows terminal ( install + set nerdfonts ) , upload json with correct conf , automatic install json config file
+- [ ] reboot after install WSL 

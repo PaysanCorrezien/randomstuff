@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# shellcheck disable=1017
 # Variables (hardcoded values)
 GITHUB_USER="paysancorrezien"
 ZSH_PATH="/usr/bin/zsh"
@@ -20,6 +20,7 @@ install_packages() {
 	sudo apt update
 	sudo apt install -y curl git unzip python3 python3-pip python3-setuptools python3-venv xclip wget autorandr jq fzf zoxide bat ripgrep tmux exa neofetch zsh || print_error "Failed to install packages"
 	sudo apt install -y dnsutils console-setup
+  sudo apt install default-jre # for ltex-lsp neovim
 }
 
 install_node() {
@@ -71,7 +72,7 @@ install_rust() {
 }
 
 check_branch_exists() {
-    local repo=$1
+    local repo=$
     local branch=$2
     local branches
 
@@ -178,6 +179,13 @@ sudoers_configuration() {
 	echo "Configuring sudoers for $USER..."
 	echo "$USER ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee /etc/sudoers.d/"$USER" || print_error "Failed to configure sudoers"
 }
+setup_secrets_tmpl(){
+  echo "setting up secrets template for zsh"
+echo 'export OPENAI_API_KEY="" \
+export NNN_BMS="" \
+export SITUATION="personal" \'
+
+}
 
 install_fira_code_font() {
 	echo "Downloading and installing Fira Code Nerd Font..."
@@ -201,6 +209,9 @@ get_latest_release() {
 	curl --silent "https://api.github.com/repos/$1/releases/latest" |
 		grep '"tag_name":' |
 		sed -E 's/.*"([^"]+)".*/\1/'
+}
+prepare_tmux_plugins(){
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 }
 
 get_latest_tag() {
@@ -246,6 +257,16 @@ install_lazygit() {
 	echo "INFO: Lazygit installed successfully!"
 }
 
+install_pyenv(){
+  # Install pyenv dependencies
+sudo apt install -y make build-essential libssl-dev zlib1g-dev \
+libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
+libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev git
+
+# Install pyenv
+curl https://pyenv.run | bash
+}
+
 install_nvm() {
 
 	echo "Installing NVM..."
@@ -268,14 +289,17 @@ main() {
 	install_lunarvim
 	install_chezmoi
 	clone_dotfiles
+  prepare_tmux_plugins
+  create_chezmoi_template
+setup_secrets_tmpl
 	setup_chezmoi
 	configure_wsl
 	allow_ping_without_sudo # Assuming you'd want to keep one of the two.
 	set_dns_wsl "$IP_DNS"
-	install_lazygit
-	install_powershell_on_debian
+  install_pyenv
+	# install_lazygit
+	# install_powershell_on_debian
 	install_fira_code_font
-	
 }
 
 # Call the main function
