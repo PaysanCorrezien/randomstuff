@@ -70,6 +70,15 @@ install_neovim() {
     else
         print_error "Neovim tar.gz file not found"
     fi
+    echo "Copying Neovim binary to /usr/bin/"
+    sudo cp /usr/local/nvim-linux64/bin/nvim /usr/bin/ || print_error "Failed to copy Neovim binary"
+}
+
+handle_fd_find() {
+    echo "Creating a symbolic link for fd-find..."
+    mkdir -p "$HOME/.local/bin"
+    ln -s "$(which fdfind)" "$HOME/.local/bin/fd"
+    export PATH="$HOME/.local/bin:$PATH"
 }
 
 install_docker() {
@@ -106,12 +115,14 @@ optional_install() {
 
 main() {
     install_packages
+    optional_install install_docker "Docker"
+    optional_install install_tailscale "Tailscale"
     change_shell_to_zsh
     install_zap
     install_neovim
     basic_zsh_setup
-    optional_install install_docker "Docker"
-    optional_install install_tailscale "Tailscale"
+    handle_fd_find
+
 }
 
 main
