@@ -107,10 +107,12 @@ install_tailscale() {
 optional_install() {
     local install_function=$1
     local description=$2
-    read -p "Do you want to install $description? [y/N]: " -r
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    read -q "response?Install $description? [y/N] "
+    echo ""
+    if [[ $response == "y" ]]; then
         $install_function
     fi
+
 }
 
 main() {
