@@ -12,7 +12,7 @@ print_error() {
 install_packages() {
     echo "Installing essential packages..."
     sudo apt update
-    sudo apt install -y curl zsh fzf ripgrep fd-find zoxide || print_error "Failed to install packages"
+    sudo apt install -y curl zsh fzf git ripgrep fd-find zoxide || print_error "Failed to install packages"
     sudo apt install -y zsh-autosuggestions zsh-syntax-highlighting || print_error "Failed to install Zsh completion and syntax highlighting"
 }
 
