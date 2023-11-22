@@ -19,6 +19,10 @@ sudo apt install curl
 ```bash
 curl -L https://raw.githubusercontent.com/paysancorrezien/randomstuff/main/setup.sh | bash
 ```
+
+
+
+
 ## end remove
 
 # Todo 
@@ -33,4 +37,10 @@ curl -L https://raw.githubusercontent.com/paysancorrezien/randomstuff/main/setup
 ## Windows
 
 - [ ] Download and execute real cleanup utils to debloat
-- [ ] reboot after install WSL 
+- [ ] reboot after install WSL
+
+## Server VPS setup
+Basic setup 
+```bash
+curl -L https://raw.githubusercontent.com/PaysanCorrezien/randomstuff/main/debian_server.sh | bash
+```
