@@ -42,5 +42,5 @@ curl -L https://raw.githubusercontent.com/paysancorrezien/randomstuff/main/setup
 ## Server VPS setup
 Basic setup 
 ```bash
-curl -L https://raw.githubusercontent.com/PaysanCorrezien/randomstuff/main/debian_server.sh | bash
+bash <(curl -L https://raw.githubusercontent.com/PaysanCorrezien/randomstuff/main/debian_server.sh)
 ```
