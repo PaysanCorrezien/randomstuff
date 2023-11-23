@@ -107,13 +107,15 @@ install_tailscale() {
 optional_install() {
     local install_function=$1
     local description=$2
+
+    echo "Debug: About to install $description"
     read -q "response?Install $description? [y/N] "
     echo ""
     if [[ $response == "y" ]]; then
         $install_function
     fi
-
 }
+
 
 main() {
     install_packages
