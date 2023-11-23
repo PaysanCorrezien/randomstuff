@@ -146,7 +146,7 @@ main() {
     install_neovim
     basic_zsh_setup
     handle_fd_find
-    install_fzf_taf
+    install_fzf_tab
 }
 
 main
