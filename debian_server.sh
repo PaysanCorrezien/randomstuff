@@ -118,6 +118,7 @@ optional_install() {
     esac
 }
 
+
 main() {
     install_packages
     optional_install install_docker "Docker"
