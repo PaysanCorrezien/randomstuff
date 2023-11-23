@@ -27,27 +27,34 @@ change_shell_to_zsh() {
 }
 
 basic_zsh_setup() {
-    echo "Setting up basic Zsh configuration..."
-    {
-        echo "# attempt with fzf tab"
-        echo "source ~/.local/share/fzf-tab/fzf-tab.plugin.zsh"
-        echo "eval \"\$(zoxide init zsh)\""
-        echo "alias v=\"nvim\""
-        echo "alias md=\"mkdir\""
-        echo "alias rm=\"rm -irv\""
-        echo "alias rmf=\"rm -rf\""
-        echo "alias x=\"chmod +x\""
-        echo "alias ..=\"cd ../\""
-        echo "alias ...=\"cd ../../\""
-        echo "alias ....=\"cd ../../../\""
-        echo "alias .....=\"cd ../../../../\""
-        echo "source /usr/share/doc/fzf/examples/key-bindings.zsh"
-        echo "export FZF_DEFAULT_OPTS=\"--color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc --color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8\""
-        echo "export FZF_CTRL_T_COMMAND=\"\$FZF_DEFAULT_COMMAND\""
-        echo "export FZF_CTRL_T_OPTS=\"--preview 'batcat -n --color=always {}'\""
-        echo "export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude .git'"
-        echo "export FZF_CTRL_R_OPTS=\"--preview 'echo {}' --preview-window up:3:hidden:wrap --bind 'ctrl-/:toggle-preview' --bind 'ctrl-y:execute-silent(echo -n {2..} | xclip -selection clipboard)+abort' --color header:italic --header 'Press CTRL-Y to copy command into clipboard'\""
-    } >> ~/.zshrc
+    local identifier="# Basic Zsh setup added by script"
+
+    if grep -qF "$identifier" ~/.zshrc; then
+        echo "Basic Zsh setup already added to .zshrc. Skipping..."
+    else
+        echo "Setting up basic Zsh configuration..."
+        {
+            echo ""  # Ensures starting on a new line
+            echo "$identifier"
+            echo "source ~/.local/share/fzf-tab/fzf-tab.plugin.zsh"
+            echo "eval \"\$(zoxide init zsh)\""
+            echo "alias v='nvim'"
+            echo "alias md='mkdir'"
+            echo "alias rm='rm -irv'"
+            echo "alias rmf='rm -rf'"
+            echo "alias x='chmod +x'"
+            echo "alias ..='cd ../'"
+            echo "alias ...='cd ../../'"
+            echo "alias ....='cd ../../../'"
+            echo "alias .....='cd ../../../../'"
+            echo "source /usr/share/doc/fzf/examples/key-bindings.zsh"
+            echo "export FZF_DEFAULT_OPTS='--color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8 --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc --color=marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8'"
+            echo "export FZF_CTRL_T_COMMAND='\$FZF_DEFAULT_COMMAND'"
+            echo "export FZF_CTRL_T_OPTS='--preview \"batcat -n --color=always {}\"'"
+            echo "export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude .git'"
+            echo "export FZF_CTRL_R_OPTS='--preview \"echo {}\" --preview-window up:3:hidden:wrap --bind \"ctrl-/:toggle-preview\" --bind \"ctrl-y:execute-silent(echo -n {2..} | xclip -selection clipboard)+abort\" --color header:italic --header \"Press CTRL-Y to copy command into clipboard\"'"
+        } >> ~/.zshrc
+    fi
 }
 
 get_latest_tag() {
@@ -79,6 +86,17 @@ handle_fd_find() {
     mkdir -p "$HOME/.local/bin"
     ln -s "$(which fdfind)" "$HOME/.local/bin/fd"
     export PATH="$HOME/.local/bin:$PATH"
+}
+
+fzf_tab() {
+    local fzf_tab_dir="$HOME/.local/share/fzf-tab"
+
+    if [ ! -d "$fzf_tab_dir" ]; then
+        echo "Cloning fzf-tab..."
+        git clone https://github.com/Aloxaf/fzf-tab "$fzf_tab_dir" || print_error "Failed to clone fzf-tab"
+    else
+        echo "fzf-tab is already installed."
+    fi
 }
 
 install_docker() {
@@ -128,7 +146,7 @@ main() {
     install_neovim
     basic_zsh_setup
     handle_fd_find
-
+    install_fzf_taf
 }
 
 main
