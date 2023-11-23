@@ -109,13 +109,14 @@ optional_install() {
     local description=$2
 
     echo "Debug: About to install $description"
-    read -q "response?Install $description? [y/N] "
+    read -p "Install $description? [y/N]: " -r response
     echo ""
-    if [[ $response == "y" ]]; then
-        $install_function
-    fi
-}
 
+    case $response in
+        [Yy]* ) $install_function;;
+        * ) echo "Skipping $description installation.";;
+    esac
+}
 
 main() {
     install_packages
