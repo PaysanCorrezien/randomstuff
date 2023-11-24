@@ -101,13 +101,14 @@ fzf_tab() {
 
 install_docker() {
     echo "Installing Docker..."
-
     sudo apt-get update
-    sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
-    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-    sudo apt-get update
-    sudo apt-get install -y docker-ce docker-compose || print_error "Failed to install Docker and Docker Compose"
+    sudo apt-get install ca-certificates curl gnupg
+    sudo install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    sudo chmod a+r /etc/apt/keyrings/docker.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo apt-get update 
+    sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin || print_error "Failed to install Docker and Docker Compose"
 
     echo "Installing Lazydocker..."
     curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash || print_error "Failed to install Lazydocker"
@@ -115,11 +116,7 @@ install_docker() {
 
 install_tailscale() {
     echo "Installing Tailscale..."
-
-    curl -fsSL https://pkgs.tailscale.com/stable/debian/$(lsb_release -cs).gpg | sudo apt-key add -
-    curl -fsSL https://pkgs.tailscale.com/stable/debian/$(lsb_release -cs).list | sudo tee /etc/apt/sources.list.d/tailscale.list
-    sudo apt-get update
-    sudo apt-get install -y tailscale || print_error "Failed to install Tailscale"
+    curl -fsSL https://tailscale.com/install.sh | sh || print_error "Failed to install Tailscale"
 }
 
 optional_install() {
