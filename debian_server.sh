@@ -55,6 +55,8 @@ basic_zsh_setup() {
             echo "export FZF_CTRL_T_OPTS='--preview \"batcat -n --color=always {}\"'"
             echo "export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude .git'"
             echo "export FZF_CTRL_R_OPTS='--preview \"echo {}\" --preview-window up:3:hidden:wrap --bind \"ctrl-/:toggle-preview\" --bind \"ctrl-y:execute-silent(echo -n {2..} | xclip -selection clipboard)+abort\" --color header:italic --header \"Press CTRL-Y to copy command into clipboard\"'"
+            echo "host_ip=\$(hostname -I | awk '{print \$1}')" >> ~/.zshrc
+            echo "export PS1=\"\$PS1 (\$host_ip) --> \"" >> ~/.zshrc
         } >> ~/.zshrc
     fi
 }
