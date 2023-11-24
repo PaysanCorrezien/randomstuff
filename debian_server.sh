@@ -17,8 +17,10 @@ install_packages() {
 }
 
 install_zap() {
+    if ! check_pass tailscale "zap"; then
     echo "Installing Zap for Zsh..."
     zsh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/release-v1/install.zsh) || print_error "Failed to install Zap for Zsh"
+    fi
 }
 
 change_shell_to_zsh() {
@@ -64,8 +66,19 @@ get_latest_tag() {
     sed -E 's/.*"([^"]+)".*/\1/' |
     head -n 1
 }
+check_pass() {
+    local command_name=$1
+    local description=$2
+    if command -v "$command_name" >/dev/null 2>&1; then
+        echo "$description is already installed. Skipping installation."
+        return 0  # Return with success (0) to indicate skipping
+    else
+        return 1  # Return with failure (1) to indicate installation should proceed
+    fi
+}
 
 install_neovim() {
+    if ! check_pass nvim "Neovim"; then
     echo "Installing Neovim from source..."
 
     NEOVIM_VERSION=$(get_latest_tag "neovim/neovim")
@@ -79,14 +92,20 @@ install_neovim() {
     fi
     echo "Copying Neovim binary to /usr/bin/"
     sudo cp /usr/local/nvim-linux64/bin/nvim /usr/bin/ || print_error "Failed to copy Neovim binary"
+    fi
 }
 
 handle_fd_find() {
-    echo "Creating a symbolic link for fd-find..."
-    mkdir -p "$HOME/.local/bin"
-    ln -s "$(which fdfind)" "$HOME/.local/bin/fd"
-    export PATH="$HOME/.local/bin:$PATH"
+    if [ ! -f "$HOME/.local/bin/fd" ]; then
+        echo "Creating a symbolic link for fd-find..."
+        mkdir -p "$HOME/.local/bin"
+        ln -s "$(which fdfind)" "$HOME/.local/bin/fd"
+        export PATH="$HOME/.local/bin:$PATH"
+    else
+        echo "fd is already set up. Skipping."
+    fi
 }
+
 
 fzf_tab() {
     local fzf_tab_dir="$HOME/.local/share/fzf-tab"
@@ -95,11 +114,12 @@ fzf_tab() {
         echo "Cloning fzf-tab..."
         git clone https://github.com/Aloxaf/fzf-tab "$fzf_tab_dir" || print_error "Failed to clone fzf-tab"
     else
-        echo "fzf-tab is already installed."
+        echo "fzf-tab is already installed. Skipping."
     fi
 }
 
 install_docker() {
+    if ! check_pass docker "Docker"; then
     echo "Installing Docker..."
     sudo apt-get update
     sudo apt-get install ca-certificates curl gnupg
@@ -112,11 +132,14 @@ install_docker() {
 
     echo "Installing Lazydocker..."
     curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash || print_error "Failed to install Lazydocker"
+    fi
 }
 
 install_tailscale() {
+    if ! check_pass tailscale "Tailscale"; then
     echo "Installing Tailscale..."
     curl -fsSL https://tailscale.com/install.sh | sh || print_error "Failed to install Tailscale"
+    fi
 }
 
 optional_install() {
