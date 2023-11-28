@@ -17,7 +17,7 @@ install_packages() {
 }
 
 install_zap() {
-    if ! check_pass tailscale "zap"; then
+    if ! check_pass zap "zap"; then
     echo "Installing Zap for Zsh..."
     zsh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/release-v1/install.zsh) || print_error "Failed to install Zap for Zsh"
     fi
