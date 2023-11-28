@@ -109,7 +109,7 @@ handle_fd_find() {
 }
 
 
-fzf_tab() {
+install_fzf_tab() {
     local fzf_tab_dir="$HOME/.local/share/fzf-tab"
 
     if [ ! -d "$fzf_tab_dir" ]; then
