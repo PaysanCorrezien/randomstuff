@@ -185,16 +185,6 @@ function Set-ProgramInstaller
   }
 }
 
-function Install-Program
-{
-  param (
-    [Parameter(Mandatory=$true)]
-    [string]$name
-  )
-  # Use Chocolatey to install the provided software package globally
-  choco install $name -y --global
-}
-
 function CreateMultiplesRegistryKey($registryKeys)
 {
   foreach ($key in $registryKeys)
@@ -375,26 +365,126 @@ function Setup-AutoHotkey($ahkScriptPath, $ahkScriptUrl)
   $Shortcut.Arguments = "`"$ahkScriptPath`""
   $Shortcut.Save()
 }
+function Add-FolderPathToEnvPath
+{
+  param(
+    [Parameter(Mandatory=$true)]
+    [string]$folderPath
+  )
+
+  try
+  {
+    # Check if the folder path exists
+    if (-Not (Test-Path -Path $folderPath))
+    {
+      throw "Folder path does not exist: $folderPath"
+    }
+
+    # Get the current PATH environment variable for the user
+    $currentPath = [System.Environment]::GetEnvironmentVariable("PATH", "User")
+
+    # Check if the folder path is already in the PATH
+    if ($currentPath -split ';' -contains $folderPath)
+    {
+      Write-Host "Folder path already in PATH: $folderPath"
+      return
+    }
+
+    # Add folder path to the PATH environment variable
+    $newPath = $currentPath + ';' + $folderPath
+    [System.Environment]::SetEnvironmentVariable("PATH", $newPath, "User")
+
+    # Verify if the folder path was added
+    $updatedPath = [System.Environment]::GetEnvironmentVariable("PATH", "User")
+    if ($updatedPath -split ';' -contains $folderPath)
+    {
+      Write-Host "Folder path added to PATH successfully: $folderPath"
+    } else
+    {
+      throw "Failed to add folder path to PATH"
+    }
+  } catch
+  {
+    Write-Error "An error occurred: $_"
+  }
+}
+if (-not (Test-Path $env:USERPROFILE + "Documents\WindowsPowerShell\.secrets.ps1"))
+{
+  New-Item -Path $env:USERPROFILE + "Documents\WindowsPowerShell\.secrets.ps1" -ItemType File
+  "OPENAI_API_KEY = 'sk-'" | Out-File $env:USERPROFILE + "Documents\WindowsPowerShell\.secrets.ps1"
+  "GH_TOKEN = ''" | Out-File $env:USERPROFILE + "Documents\WindowsPowerShell\.secrets.ps1"
+  Write-Host "Please fill the secrets file with token for openai and github"
+}
 
 # Call the function to set up program installers
 Set-ProgramInstaller
 
+$pathtoaddtoEnv = @(
+"C:\Program Files\Git\usr\bin\",
+$env:USERPROFILE + "\AppData\Sqllite\",
+# Use the script build for that instead
+"C:\Program Files\Yazi"
+)
+# Add the folder path to the PATH environment variable
+foreach( $path in $pathtoaddtoEnv){
+  Add-FolderPathToEnvPath -folderPath $path
+}
 
 # Define a list of programs to install
-$programs = @("powertoys", "powershell-core", "python3", "7zip", 
-  "teamviewer", "autohotkey", "dotnet3.5", 
-  "sql-server-management-studio", "putty", "wireshark", "keepassxc", "brave", 
-  "obsidian", "greenshot", "keepassxc", "RegShot", "ripgrep","nextcloud-client"
-  "procmon", "fzf", "zoxide", "git", "github-desktop","pandoc","mremoteng","fd","nerd-fonts-firacode","forticlientvpn","linphone","microsoft-teams")
-
+$programs = @(
+    "powertoys", # Utilities
+    "powershell-core", # Utilities
+    "python4", # Programming Languages
+    "7zip", # Utilities
+    "teamviewer", # Remote Access
+    # "autohotkey", # Utilities
+    "dotnet4.5", # Programming Languages
+    "mingw", # Development Tools for neovim
+    "make", # Development Tools for neovim
+    "temurin", # Java for neovim LSP Ltex
+    "neovim", # Text Editors (Neovim specifics)
+    "sql-server-management-studio", # Database Tools
+    "putty", # Network Tools
+    "wireshark", # Network Tools
+    "keepassxc", # Security Tools
+    "brave", # Web Browsers
+    # "obsidian", # Productivity Tools
+    "greenshot", # Utilities
+    "keepassxc", # Security Tools
+    "RegShot", # Utilities
+    "ripgrep", # Development Tools
+    "nextcloud-client", # Cloud Storage
+    "procmon", # System Tools
+    "fzf", # Development Tools Cli
+    "zoxide", # Development Tools Cli
+    "fd", # Development Tools Cli
+    "bat", # Development Tools Cli
+    "git", # Development Tools
+    "gh" # Development Tools Github CLI
+    "hyperfine", # Development Tools
+    "github-desktop", # Development Tools
+    "pandoc", # Productivity Tools
+    "mremoteng", # Remote Access
+    "fd", # Development Tools
+    "nerd-fonts-firacode", # Fonts
+    "forticlientvpn", # Security Tools
+    "linphone", # Communication Tools
+    "microsoft-teams" # Communication Tools
+)
 
 # Needed for teams PRO
 Remove-DefaultTeams
+
 # Call the function to install each program
 foreach ($program in $programs)
 {
-  Install-Program -name $program
+ choco install $program -y --global
 }
+
+# Sqllite DLL
+$dllUrl = 'https://github.com/PaysanCorrezien/randomstuff/deps/sqllite/sqlite3.dll'
+$dllDest = $env:USERPROFILE + "\AppData\sqllite\sqlite3.dll"
+
 
 # Refresh the current session's PATH to get access to git
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
@@ -420,5 +510,6 @@ Install-WingetApp -appNames $appsToInstall
 # Example usage
 $modulesToInstall = @('PSFzf', 'PSReadLine', 'BurntToast')
 Install-PowershellModules -ModuleNames $modulesToInstall
+
 # Run the provided script from the URL
 # Invoke-Expression (Invoke-RestMethod -Uri https://raw.githubusercontent.com/ChrisTitusTech/winutil/main/winutil.ps1)
