@@ -482,9 +482,9 @@ foreach ($program in $programs)
 }
 
 # Sqllite DLL
-$dllUrl = 'https://github.com/PaysanCorrezien/randomstuff/deps/sqllite/sqlite3.dll'
-$dllDest = $env:USERPROFILE + "\AppData\sqllite\sqlite3.dll"
-
+$dllUrl_SQL = 'https://github.com/PaysanCorrezien/randomstuff/deps/sqllite/sqlite3.dll'
+$dllDest_SQL = $env:USERPROFILE + "\AppData\sqllite\sqlite3.dll"
+Download-And-Register-Dll -dllUrl $dllUrl_SQL -dllDest $dllDest_SQL
 
 # Refresh the current session's PATH to get access to git
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
